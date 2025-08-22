@@ -1,8 +1,11 @@
+# app.py
+
 import pickle
 import pandas as pd
 import numpy as np
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
+from fastapi.middleware.cors import CORSMiddleware # Import the CORS middleware
 
 # --- 1. Initialize FastAPI App ---
 app = FastAPI(
@@ -11,7 +14,17 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# --- 2. Load Saved Artifacts ---
+# --- 2. Add CORS Middleware ---
+# This is the new, crucial section for solving the 'Failed to fetch' error.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allows all origins
+    allow_credentials=True,
+    allow_methods=["*"],  # Allows all methods (GET, POST, etc.)
+    allow_headers=["*"],  # Allows all headers
+)
+
+# --- 3. Load Saved Artifacts ---
 # These files are loaded once when the API starts.
 try:
     with open('Best_Rainfall_Prediction_Model.pkl', 'rb') as f:
@@ -29,7 +42,7 @@ try:
 except FileNotFoundError as e:
     raise RuntimeError(f"Could not load a necessary artifact: {e}. Ensure all .pkl files are present.")
 
-# --- 3. Define API Input/Output Models ---
+# --- 4. Define API Input/Output Models ---
 class RainfallInput(BaseModel):
     SUBDIVISION_ID: int
     JAN: float = Field(..., example=10.5)
@@ -41,11 +54,11 @@ class RainfallInput(BaseModel):
     JUL: float = Field(..., example=250.6)
     AUG: float = Field(..., example=240.7)
     SEP: float = Field(..., example=130.8)
-    OCT: float = Field(..., example=60.9)
+    OCT: float = float = Field(..., example=60.9)
     NOV: float = Field(..., example=25.0)
     DEC: float = Field(..., example=15.1)
 
-# --- 4. API Endpoints ---
+# --- 5. API Endpoints ---
 
 @app.get("/", summary="API Root", tags=["Status"])
 def read_root():
