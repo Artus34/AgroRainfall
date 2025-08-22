@@ -54,7 +54,7 @@ class RainfallInput(BaseModel):
     JUL: float = Field(..., example=250.6)
     AUG: float = Field(..., example=240.7)
     SEP: float = Field(..., example=130.8)
-    OCT: float = float = Field(..., example=60.9)
+    OCT: float = Field(..., example=60.9) # Corrected line
     NOV: float = Field(..., example=25.0)
     DEC: float = Field(..., example=15.1)
 
